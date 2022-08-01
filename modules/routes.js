@@ -159,15 +159,34 @@ Router.get("/category/:name", (req, res) => {
     .catch((err) => res.status(404).json());
 });
 
-// Router.get("/set", ({ cookies }, res) => {
-//   res.cookie("name", "sediq", { maxAge: 60000 });
-//   console.log(cookies);
-//   res.end();
-// });
-// Router.get("/clear", (req, res) => {
-//   res.clearCookie("name");
-//   res.end();
-// });
+Router.post("/comment/:id", (req, res) => {
+  const { name, comment, time } = req.body;
+  post
+    .findById(req.params.id)
+    .then((data) => {
+      if (data != null) {
+        if (name == undefined || (name == "" && comment == undefined)) {
+          console.log("Cannot comment");
+          res.status(404).end();
+        } else {
+          let Comment = {
+            comment: comment,
+            name: name,
+            time: time,
+          };
+          data.comments.push(Comment);
+          post
+            .findByIdAndUpdate(req.params.id, { comments: data.comments })
+            .then(() => console.log("done"), res.end())
+            .catch((err) => console.error(err));
+        }
+      } else {
+        console.log("hey");
+        res.status(404).end();
+      }
+    })
+    .catch((err) => res.status(500).end());
+});
 Router.get("/article/:id", async (req, res) => {
   post
     .findOne({ _id: req.params.id })
