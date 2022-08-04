@@ -50,6 +50,9 @@ Router.get("/image/:id", (req, res) => {
     })
     .catch((err) => res.status(404).end());
 });
+function l(data) {
+  console.log(data);
+}
 Router.get("/", async (req, res) => {
   if (req.query.q == "tpbg") {
     await post
@@ -93,55 +96,71 @@ Router.delete("/delete/:id", isLogin, (req, res) => {
     });
 });
 var cookieSettings = {
-  maxAge: 50000,
+  maxAge: oneDay,
   httpOnly: true,
-  overwrite: true,
 };
+
 Router.post("/like/:id", (req, res) => {
-  if (req.cookies.likeId == undefined) {
+  if (req.cookies.like == undefined) {
     post
       .findById(req.params.id)
       .then((data) => {
-        post
-          .findByIdAndUpdate(data._id, { likes: data.likes + 1 })
-          .then((data) => {
-            res.cookie("likeId", [req.params.id], cookieSettings);
-            res.end();
-          });
+        if (data) {
+          post
+            .findByIdAndUpdate(data._id, { likes: data.likes + 1 })
+            .then((ress) => {
+              l("New like just came in");
+              res.cookie("like", [req.params.id], cookieSettings);
+              res.end();
+            })
+            .catch((err) => l(err));
+        } else {
+          res.send("No such post");
+        }
       })
-      .catch((err) => {
-        console.log(err);
-        res.status(404).end();
-      });
+      .catch((err) => console.log(Date.now.toDateString(), err));
   } else {
-    req.cookies.likeId.forEach((like) => {
-      if (like == req.params.id) {
-        console.log("Already Liked", req.cookies);
-      } else {
-        console.log("like");
-      }
+    // If like already exist on cookie
+    let cookie = [...req.cookies.like];
+    let newCookie = req.cookies.like.filter((c) => {
+      return c == req.params.id;
     });
-    // if (req.cookies.likeId[i] == req.params.id) {
-    //   res.json({ liked: true });
-    // } else {
-    //   post.findById(req.params.id).then((data) => {
-    //     post
-    //       .findByIdAndUpdate(data._id, { likes: data.likes + 1 })
-    //       .then((data) => {
-    //         like_id.push(req.params.id);
-    //         res.cookie("likeId", like_id, {
-    //           maxAge: 50000,
-    //           httpOnly: true,
-    //         });
-    //         console.log(req.cookies.likeId);
-    //       });
-    //   });
-    // }
-    // post.findByIdAndUpdate(req.params.id, { likes: +1 });
-    // res.cookie("likeId", like_id, {
-    //   maxAge: 50000,
-    //   httpOnly: false,
-    // });
+    if (newCookie == "") {
+      // If the request sent is not in the cookie
+      // When liking a new post with other post liked
+      post.findByIdAndUpdate(req.params.id, { likes: +1 }).then((data) => {
+        if (data) {
+          cookie.push(req.params.id);
+          res.clearCookie("like");
+          res.cookie("like", cookie, cookieSettings).end();
+          l("New like");
+        } else {
+          l("Post not found");
+          res.status(404);
+        }
+        res.end();
+      });
+    } else {
+      // If the post has already been liked
+      // Removing like from post
+      newCookie = cookie.filter((c) => {
+        return c != req.params.id;
+      });
+      post.findById(req.params.id).then((data) => {
+        if (data) {
+          post
+            .findByIdAndUpdate(req.params.id, { likes: data.likes - 1 })
+            .then((data) => {
+              res.clearCookie("like");
+              res.cookie("like", newCookie, cookieSettings);
+              res.end();
+            });
+        } else {
+          l("Not found");
+          res.status(404).send("Post Not found");
+        }
+      });
+    }
   }
 });
 Router.post("/login", loginAuth);
@@ -177,7 +196,7 @@ Router.post("/comment/:id", (req, res) => {
           data.comments.push(Comment);
           post
             .findByIdAndUpdate(req.params.id, { comments: data.comments })
-            .then(() => console.log("done"), res.end())
+            .then(() => console.log("done"), res.json("done"))
             .catch((err) => console.error(err));
         }
       } else {
