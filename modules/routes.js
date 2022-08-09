@@ -30,7 +30,7 @@ Router.use(cookie("supersecure"));
 Router.use(
   cors({
     credentials: true,
-    origin: "http://localhost:3000",
+    origin: "http://192.168.8.101:3000",
     optionsSuccessStatus: 200, // For legacy browsers
   })
 );
@@ -73,6 +73,15 @@ Router.get("/", async (req, res) => {
         res.status(404).end();
         console.log(err);
       });
+  } else if (req.query.q == "side") {
+    post
+      .find()
+      .sort({ views: "descending" })
+      .limit(5)
+      .then((data) => {
+        res.json(data);
+      })
+      .catch((err) => res.status(500).end());
   } else {
     let data;
     post
@@ -101,69 +110,93 @@ var cookieSettings = {
 };
 
 Router.post("/like/:id", (req, res) => {
-  if (req.cookies.like == undefined) {
-    post
-      .findById(req.params.id)
-      .then((data) => {
-        if (data) {
-          post
-            .findByIdAndUpdate(data._id, { likes: data.likes + 1 })
-            .then((ress) => {
-              l("New like just came in");
-              res.cookie("like", [req.params.id], cookieSettings);
-              res.end();
-            })
-            .catch((err) => l(err));
-        } else {
-          res.send("No such post");
-        }
-      })
-      .catch((err) => console.log(Date.now.toDateString(), err));
+  if (req.params.id == undefined || req.params.id == "") {
+    res.status(404).end();
   } else {
-    // If like already exist on cookie
-    let cookie = [...req.cookies.like];
-    let newCookie = req.cookies.like.filter((c) => {
-      return c == req.params.id;
-    });
-    if (newCookie == "") {
-      // If the request sent is not in the cookie
-      // When liking a new post with other post liked
-      post.findByIdAndUpdate(req.params.id, { likes: +1 }).then((data) => {
-        if (data) {
-          cookie.push(req.params.id);
-          res.clearCookie("like");
-          res.cookie("like", cookie, cookieSettings).end();
-          l("New like");
-        } else {
-          l("Post not found");
-          res.status(404);
-        }
-        res.end();
-      });
+    if (req.cookies.like == undefined) {
+      post
+        .findById(req.params.id)
+        .then((data) => {
+          if (data) {
+            post
+              .findByIdAndUpdate(data._id, { likes: (data.likes += 1) })
+              .then((ress) => {
+                l("New like just came in");
+                res.cookie("like", [req.params.id], cookieSettings);
+                res.json({ like: true });
+                res.end();
+              })
+              .catch((err) => l(err));
+          } else {
+            res.send("No such post");
+          }
+        })
+        .catch((err) => console.log(Date.now.toDateString(), err));
     } else {
-      // If the post has already been liked
-      // Removing like from post
-      newCookie = cookie.filter((c) => {
-        return c != req.params.id;
+      // If like already exist on cookie
+      let cookie = [...req.cookies.like];
+      let newCookie = req.cookies.like.filter((c) => {
+        return c == req.params.id;
       });
-      post.findById(req.params.id).then((data) => {
-        if (data) {
-          post
-            .findByIdAndUpdate(req.params.id, { likes: data.likes - 1 })
-            .then((data) => {
-              res.clearCookie("like");
-              res.cookie("like", newCookie, cookieSettings);
-              res.end();
-            });
-        } else {
-          l("Not found");
-          res.status(404).send("Post Not found");
-        }
-      });
+      if (newCookie == "") {
+        // If the request sent is not in the cookie
+        // When liking a new post with other post liked
+        post
+          .findById(req.params.id)
+          .then((data) => {
+            if (data != "") {
+              post
+                .findByIdAndUpdate(data._id, { likes: data.likes + 1 })
+                .then((data) => {
+                  if (data) {
+                    cookie.push(req.params.id);
+                    res.clearCookie("like");
+                    res.cookie("like", cookie, cookieSettings);
+                    res.json({ like: true });
+                  } else {
+                    l("Post not found");
+                    res.status(404);
+                  }
+                  res.end();
+                });
+            }
+          })
+          .catch((err) => res.status(404).json());
+      } else {
+        // If the post has already been liked
+        // Removing like from post
+        newCookie = cookie.filter((c) => {
+          return c != req.params.id;
+        });
+        post.findById(req.params.id).then((data) => {
+          if (data) {
+            post
+              .findByIdAndUpdate(req.params.id, { likes: data.likes - 1 })
+              .then((data) => {
+                res.clearCookie("like");
+                res.cookie("like", newCookie, cookieSettings);
+                res.json({ like: false });
+              });
+          } else {
+            l("Not found");
+            res.status(404).send("Post Not found");
+          }
+        });
+      }
     }
   }
 });
 Router.post("/login", loginAuth);
+Router.put("/like/:id", (req, res) => {
+  // check if already liked after refreshing page
+  if (req.cookies.like == "" || req.cookies.like == undefined) {
+    res.json({ like: false });
+  } else {
+    req.cookies.like.forEach((like) => {
+      if (like == req.params.id) res.json({ like: true });
+    });
+  }
+});
 Router.get("/category/:name", (req, res) => {
   post
     .find({ category: req.params.name })
@@ -249,5 +282,9 @@ Router.post("/post", isLogin, upload.single("image"), (req, res) => {
     .catch((err) => {
       res.status(404);
     });
+});
+Router.get("/like/:id", (req, res) => {
+  console.log(req.cookies.likeId);
+  res.end();
 });
 module.exports = Router;
