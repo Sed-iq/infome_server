@@ -3,7 +3,8 @@ const express = require("express"),
   mongoose = require("mongoose"),
   Router = require("./modules/routes");
 
-app.use(Router);
+// app.use(Router);
+app.get("/", (req, res) => res.send("HEY"));
 mongoose
   .connect(
     "mongodb+srv://Trustadmin:08126074692@cluster0.t9mbj.mongodb.net/TrustNg"
