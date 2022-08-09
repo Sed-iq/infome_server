@@ -27,13 +27,7 @@ Router.use(
 );
 // Getting images
 Router.use(cookie("supersecure"));
-Router.use(
-  cors({
-    credentials: true,
-    origin: "http://192.168.8.101:3000",
-    optionsSuccessStatus: 200, // For legacy browsers
-  })
-);
+
 // image route
 Router.get("/image/:id", (req, res) => {
   post
