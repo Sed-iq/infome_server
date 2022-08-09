@@ -1,7 +1,7 @@
 const express = require("express"),
   app = express(),
-  mongoose = require("mongoose"),
-  Router = require("./modules/routes");
+  mongoose = require("mongoose");
+// Router = require("./modules/routes");
 
 // app.use(Router);
 app.get("/", (req, res) => res.send("HEY"));
