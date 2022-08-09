@@ -7,6 +7,5 @@ const express = require("express"),
 app.use(Router);
 starter(
   app,
-  process.env.DB_PORT
-  // "mongodb+srv://Trustadmin:08126074692@cluster0.t9mbj.mongodb.net/TrustNg"
+  "mongodb+srv://Trustadmin:08126074692@cluster0.t9mbj.mongodb.net/TrustNg"
 );
