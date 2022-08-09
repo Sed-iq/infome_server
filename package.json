@@ -4,8 +4,8 @@
   "description": "A blog api",
   "main": "api.js",
   "scripts": {
-    "start": "node api.js",
-    "dev": "nodemon api.js"
+    "start": "node app.js",
+    "dev": "nodemon app.js"
   },
   "engines": {
     "node": ">=16.0.0"

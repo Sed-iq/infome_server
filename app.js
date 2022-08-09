@@ -1,12 +1,9 @@
 const express = require("express");
 const mongoose = require("mongoose");
+const Router = require("./modules/routes");
 const app = express();
 let PORT =
   "mongodb+srv://Trustadmin:08126074692@cluster0.t9mbj.mongodb.net/TrustNg";
-
-app.use((req, res) => {
-  res.json({ name: "sediq" });
-});
 
 mongoose
   .connect(PORT)
@@ -16,3 +13,4 @@ mongoose
   .catch((err) => {
     console.log(err);
   });
+app.use(Router);
