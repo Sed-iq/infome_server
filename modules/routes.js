@@ -29,6 +29,9 @@ Router.use(
 Router.use(cookie("supersecure"));
 
 // image route
+Router.use((req, res) => {
+  res.send("Fuck the united states governments");
+});
 Router.get("/image/:id", (req, res) => {
   post
     .findById(req.params.id)
