@@ -14,13 +14,15 @@ mongoose
   .catch((err) => {
     console.log(err);
   });
+
 app.use((req, res) => {
-  Post.find()
-    .then((data) => {
-      res.json(data);
-    })
-    .catch((err) => {
-      console.error(err);
-      res.send(JSON.stringify(err));
-    });
+  // Post.find()
+  //   .then((data) => {
+  //     res.json(data);
+  //   })
+  //   .catch((err) => {
+  //     console.error(err);
+  //     res.send(JSON.stringify(err));
+  //   });
+  res.send("fuckl");
 });
