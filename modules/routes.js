@@ -13,7 +13,6 @@ const express = require("express"),
   post = require("./postSchema");
 let oneDay = 1000 * 60 * 60 * 24;
 
-Router.use(cors());
 Router.use(bodyParser({ extended: true }));
 Router.use(
   session({
@@ -28,7 +27,7 @@ Router.use(
 );
 // Getting images
 Router.use(cookie("supersecure"));
-Router.use(cors({ origin: "*", credentials: true }));
+// Router.use(cors({ origin: "*", credentials: true }));
 // image route
 Router.get("/image/:id", (req, res) => {
   post
