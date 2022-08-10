@@ -9,7 +9,7 @@ let PORT =
 mongoose
   .connect(PORT)
   .then(() => {
-    app.listen(process.env.PORT, () => console.log("Server running"));
+    app.listen(process.env.PORT || 5000, () => console.log("Server running"));
   })
   .catch((err) => {
     console.log(err);
