@@ -16,13 +16,11 @@ mongoose
   });
 
 app.use((req, res) => {
-  // Post.find()
-  //   .then((data) => {
-  //     res.json(data);
-  //   })
-  //   .catch((err) => {
-  //     console.error(err);
-  //     res.send(JSON.stringify(err));
-  //   });
-  res.send("fuckl");
+  Post.find()
+    .then((data) => {
+      res.json(data);
+    })
+    .catch((err) => {
+      res.json(err);
+    });
 });
