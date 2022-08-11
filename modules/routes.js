@@ -28,7 +28,10 @@ Router.use(
 // Getting images
 Router.use(cookie("supersecure"));
 Router.use(
-  cors({ origin: "https://blogctr.herokuapp.com/", credentials: true })
+  cors({
+    origin: "http://192.168.43.71:3000/",
+    credentials: true,
+  })
 );
 // image route
 Router.get("/image/:id", (req, res) => {
