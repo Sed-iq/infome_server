@@ -29,8 +29,9 @@ Router.use(
 Router.use(cookie("supersecure"));
 Router.use(
   cors({
-    origin: "http://192.168.43.71:3000/",
+    origin: "https://blogctr.herokuapp.com/",
     credentials: true,
+    optionsSuccessStatus: 200,
   })
 );
 // image route
