@@ -2,8 +2,8 @@ const express = require("express");
 const mongoose = require("mongoose");
 const Router = require("./modules/routes");
 const app = express();
-let PORT =
-  "mongodb+srv://Trustadmin:08126074692@cluster0.t9mbj.mongodb.net/TrustNg";
+let PORT = "mongodb+srv://Trustadmin:08126074692@cluster0.t9mbj.mongodb.net/TrustNg";
+// "mongodb://127.0.0.1/blog";
 
 mongoose
   .connect(PORT)

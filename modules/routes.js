@@ -13,7 +13,13 @@ const express = require("express"),
   post = require("./postSchema");
 let oneDay = 1000 * 60 * 60 * 24;
 
-Router.use(bodyParser({ extended: true }));
+Router.use(
+  cors({
+    origin: "https://blogctr.herokuapp.com",
+    credentials: true,
+  })
+);
+Router.use(bodyParser({ extendd: true }));
 Router.use(
   session({
     secret: "session",
@@ -27,13 +33,6 @@ Router.use(
 );
 // Getting images
 Router.use(cookie("supersecure"));
-Router.use(
-  cors({
-    origin: "https://blogctr.herokuapp.com/",
-    credentials: true,
-    optionsSuccessStatus: 200,
-  })
-);
 // image route
 Router.get("/image/:id", (req, res) => {
   post
@@ -53,6 +52,7 @@ Router.get("/image/:id", (req, res) => {
 function l(data) {
   console.log(data);
 }
+
 Router.get("/", async (req, res) => {
   if (req.query.q == "tpbg") {
     await post
