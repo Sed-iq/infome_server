@@ -11,6 +11,7 @@ const express = require("express"),
   upload = require("./uploadController"),
   { loginAuth, isLogin } = require("./auth"),
   post = require("./postSchema");
+  fs = require("fs")
 let oneDay = 1000 * 60 * 60 * 24;
 
 Router.use(
@@ -97,7 +98,10 @@ Router.delete("/delete/:id", isLogin, (req, res) => {
   post
     .findByIdAndDelete(req.params.id)
     .then((data) => {
-      res.status(200).end();
+    fs.unlink(path.join(__dirname + `/../uploads/${data.image}`), (err =>{
+      if(err) console.log(err)
+        else res.status(200).end()
+    }))
     })
     .catch((err) => {
       res.status(404).end();
@@ -240,25 +244,21 @@ Router.post("/comment/:id", (req, res) => {
     .catch((err) => res.status(500).end());
 });
 Router.get("/article/:id", async (req, res) => {
-  post
-    .findOne({ _id: req.params.id })
-    .then((data) =>
+  await post.findOne({ _id: req.params.id }).then((data) => {
+    if (data) {
       post.findByIdAndUpdate(data._id, { views: data.views + 1 })
-    );
-  await post
-    .findById(req.params.id)
-    .then((data) => {
-      if (data !== null || data !== "") {
-        res.json(data);
-        res.end();
-      } else {
-        res.status(404).end();
-        res.end();
-      }
-    })
-    .catch((err) => {
-      res.status(404).json(err);
-    });
+      .then(result =>{
+        res.json(result)
+      })
+      .catch(err =>{
+        res.status(404).end()
+      })
+
+    } else {
+      res.status(404).end();
+    }
+  });
+ 
 });
 // Adding a blog
 Router.post("/post", isLogin, upload.single("image"), (req, res) => {
