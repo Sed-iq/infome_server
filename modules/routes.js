@@ -11,12 +11,12 @@ const express = require("express"),
   upload = require("./uploadController"),
   { loginAuth, isLogin } = require("./auth"),
   post = require("./postSchema");
-  fs = require("fs")
+fs = require("fs");
 let oneDay = 1000 * 60 * 60 * 24;
 
 Router.use(
   cors({
-    origin: "https://blogctr.herokuapp.com",
+    origin: "https://infome.gq",
     credentials: true,
   })
 );
@@ -98,10 +98,10 @@ Router.delete("/delete/:id", isLogin, (req, res) => {
   post
     .findByIdAndDelete(req.params.id)
     .then((data) => {
-    fs.unlink(path.join(__dirname + `/../uploads/${data.image}`), (err =>{
-      if(err) console.log(err)
-        else res.status(200).end()
-    }))
+      fs.unlink(path.join(__dirname + `/../uploads/${data.image}`), (err) => {
+        if (err) console.log(err);
+        else res.status(200).end();
+      });
     })
     .catch((err) => {
       res.status(404).end();
@@ -246,19 +246,18 @@ Router.post("/comment/:id", (req, res) => {
 Router.get("/article/:id", async (req, res) => {
   await post.findOne({ _id: req.params.id }).then((data) => {
     if (data) {
-      post.findByIdAndUpdate(data._id, { views: data.views + 1 })
-      .then(result =>{
-        res.json(result)
-      })
-      .catch(err =>{
-        res.status(404).end()
-      })
-
+      post
+        .findByIdAndUpdate(data._id, { views: data.views + 1 })
+        .then((result) => {
+          res.json(result);
+        })
+        .catch((err) => {
+          res.status(404).end();
+        });
     } else {
       res.status(404).end();
     }
   });
- 
 });
 // Adding a blog
 Router.post("/post", isLogin, upload.single("image"), (req, res) => {
