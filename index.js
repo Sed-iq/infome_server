@@ -6,8 +6,9 @@ const imgsch = require("./modules/fakeimg");
 const bodyParser = require("body-parser");
 const path = require("path");
 const app = express();
-let PORT = "mongodb://localhost/blog";
-// "mongodb+srv://Trustadmin:08126074692@cluster0.t9mbj.mongodb.net/TrustNg";
+let PORT =
+  "mongodb+srv://Trustadmin:08126074692@cluster0.t9mbj.mongodb.net/TrustNg";
+//"mongodb://localhost/blog";
 app.use(bodyParser({ extended: true }));
 
 app.get("/", ({}, res) => {
