@@ -1,6 +1,7 @@
 /*
 Original blog router code by Ikki Tenrio 17th july 2022, [Not original creation date]
 */
+
 const express = require("express"),
   Router = express(),
   path = require("path"),
@@ -20,7 +21,7 @@ Router.use(
     credentials: true,
   })
 );
-Router.use(bodyParser({ extendd: true }));
+Router.use(bodyParser({ extended: true }));
 Router.use(
   session({
     secret: "session",
