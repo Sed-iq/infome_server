@@ -7,6 +7,7 @@ const express = require("express"),
   path = require("path"),
   bodyParser = require("body-parser"),
   cors = require("cors"),
+  cloudinary = require("cloudinary").v2,
   cookie = require("cookie-parser"),
   session = require("express-session"),
   upload = require("./uploadController"),
@@ -15,6 +16,11 @@ const express = require("express"),
 fs = require("fs");
 let oneDay = 1000 * 60 * 60 * 24;
 
+cloudinary.config({
+  cloud_name: process.env.CLOUD_NAME,
+  api_key: process.env.API_KEY,
+  api_secret: process.env.API_SECRET,
+});
 Router.use(
   cors({
     origin: "https://infome.gq",
@@ -24,7 +30,7 @@ Router.use(
 Router.use(bodyParser({ extended: true }));
 Router.use(
   session({
-    secret: "session",
+    secret: "etghthg45y45nUHBFWE34789G7tfgp7frfg7",
     saveUninitialized: true,
     resave: true,
     cookie: {
@@ -34,7 +40,7 @@ Router.use(
   })
 );
 // Getting images
-Router.use(cookie("supersecure"));
+Router.use(cookie("hufh378t485837to78G7CFGO8FTGtf78"));
 // image route
 Router.get("/image/:id", (req, res) => {
   post
@@ -62,7 +68,7 @@ Router.get("/", async (req, res) => {
       .sort({ createdAt: "descending" })
       .limit(1)
       .then((data) => {
-        res.sendFile(path.join(__dirname + "/../uploads/" + data[0].image));
+        res.redirect(data[0].image);
       });
   } else if (req.query.q == "all") {
     await post
@@ -262,26 +268,41 @@ Router.get("/article/:id", async (req, res) => {
 });
 // Adding a blog
 Router.post("/post", isLogin, upload.single("image"), (req, res) => {
-  const { body, title, snippet, category } = req.body,
-    file = req.file.filename,
-    Post = new post({
-      title: title,
-      body: body,
-      snippet: snippet,
-      image: file,
-      category: category,
-      likes: 0,
-      views: 0,
-      dislikes: 0,
-    });
-  Post.save()
-    .then((data) => {
-      res.status(200);
-      res.end();
-    })
-    .catch((err) => {
-      res.status(404);
-    });
+  if (req.file) {
+    let cld_uploader = cloudinary.uploader
+      .upload_stream(
+        {
+          folder: "/test",
+        },
+        (err, result) => {
+          if (err) res.json(err);
+          else {
+            const { body, title, snippet, category } = req.body,
+              Post = new post({
+                title: title,
+                body: body,
+                snippet: snippet,
+                image: result.secure_url,
+                category: category,
+                likes: 0,
+                views: 0,
+                dislikes: 0,
+              });
+            Post.save()
+              .then((data) => {
+                res.status(200);
+                res.end();
+              })
+              .catch((err) => {
+                res.status(404);
+              });
+          }
+        }
+      )
+      .end(req.file.buffer);
+  } else {
+    res.status(404).json("No file");
+  }
 });
 Router.get("/like/:id", (req, res) => {
   console.log(req.cookies.likeId);
