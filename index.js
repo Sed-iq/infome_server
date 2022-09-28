@@ -9,8 +9,8 @@ const cloudinary = require("cloudinary").v2;
 const path = require("path");
 const fs = require("fs");
 const app = express();
-let PORT = "mongodb://localhost/blog";
-// "mongodb+srv://Trustadmin:08126074692@cluster0.t9mbj.mongodb.net/TrustNg";
+let PORT =
+  "mongodb+srv://Trustadmin:08126074692@cluster0.t9mbj.mongodb.net/TrustNg";
 app.use(bodyParser({ extended: true }));
 cloudinary.config({
   cloud_name: process.env.CLOUD_NAME,
