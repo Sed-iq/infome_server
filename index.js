@@ -2,11 +2,8 @@ const express = require("express");
 const dotenv = require("dotenv").config();
 const mongoose = require("mongoose");
 const Router = require("./modules/routes");
-const bodyParser = require("body-parser");
-const app = express();
-let PORT =
-  "mongodb+srv://Trustadmin:08126074692@cluster0.t9mbj.mongodb.net/TrustNg";
-//"mongodb://localhost/blog";
+const bodyParser = require("body-parser") 
+const PORT = process.env.URI
 app.use(bodyParser({ extended: true }));
 
 mongoose
