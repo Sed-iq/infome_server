@@ -15,4 +15,4 @@ mongoose
     console.log(err);
   });
 
-app.use(Router);
+app.use(Router)
